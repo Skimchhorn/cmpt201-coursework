@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+int main() {
+  char *buffer = NULL;
+  size_t size = 0;
+  printf("Enter programs to run.\n");
+  getline(&buffer, &size, stdin);
+
+  printf("%s", buffer);
+
+  return 0;
+}

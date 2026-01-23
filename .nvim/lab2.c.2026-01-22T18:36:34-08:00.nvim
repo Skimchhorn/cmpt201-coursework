@@ -1,0 +1,43 @@
+#define _POSIX_C_SOURCE 200809L
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <wait.h>
+#include <unistd.h>
+int main() {
+  char *buffer = NULL;
+  size_t size = 0;
+
+  while (1) {
+    printf("Enter programs to run.\n");
+    size_t len = getline(&buffer, &size, stdin);
+
+    buffer[len - 1] = "\0"
+
+        pid_t pid = fork();
+
+    if (pid) {
+      int wstatus = 0;
+      if (waitpid(pid, &wstatus, 0) == -1) {
+        perror("hello you got an error");
+        exit(EXIT_FAILURE);
+      }
+
+      if (WIFEXITED(wstatus)) {
+        printf("Child done with exit status: %d\n", WEXITSTATUS(wstatus));
+      } else {
+        printf("Child did not exit normally.\n");
+      }
+
+      free(buffer);
+      buffer = NULL;
+
+    } else {
+      if (execl(buffer, buffer, (char *)NULL) == -1) {
+        perror("execl failed \n");
+        exit(EXIT_FAILURE);
+      }
+    }
+  }
+  return 0;
+}
