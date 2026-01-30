@@ -1,0 +1,64 @@
+#define _POSIX_C_SOURCE 200809L
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string.h>
+int main(void) {
+  char *input_history[MAX_LEN];
+  int history_count = 0;
+
+  void add_to_history(char *input);
+  void remove_oldest_record();
+  void print_history();
+  char *get_input();
+
+  int main() {
+    while (1) {
+      char *input = get_input();
+      add_history(input);
+      if (strcmp(input, "print") == 0) {
+
+        print_history();
+      }
+    }
+    free(input_history);
+    return 0;
+  }
+  void print_history() {
+    for (int i = 0; i < history_count; i++) {
+      printf("%s\n", input_history[i]);
+    }
+  }
+  char *get_input() {
+
+    char *buffer = NULL;
+    size_t bufsize = 0;
+    printf("Enter input: ");
+    size_t len = getline(&buffer, bufsize, stdin);
+    if (len == -1) {
+      exit(1);
+    }
+    buffer[len - 1] = '\0';
+    return buffer;
+  }
+
+  void add_to_history(char *input) {
+    if (history_count >= MAX_LEN) {
+      remove_oldest_record();
+    }
+    input_history[history_count] = input;
+    historg_count++;
+  }
+
+  void remove_oldest_record() {
+    if (history_count > 0) {
+
+      free(input[0]);
+    }
+
+    for (int i = 1; i < history_count; i++) {
+      input_history[i - 1] = input_history[i]
+    }
+    history_count--;
+  }
+}
