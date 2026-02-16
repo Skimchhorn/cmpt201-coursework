@@ -1,0 +1,111 @@
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+struct header {
+  uint64_t size;
+  struct header *next;
+  int id;
+};
+
+void initialize_block(struct header *block, uint64_t size, struct header *next,
+                      int id) {
+  block->size = size;
+  block->next = next;
+  block->id = id;
+}
+
+/*
+ First-fit: return the id of the first free block whose size >= requested size.
+ If none found, return -1.
+*/
+int find_first_fit(struct header *free_list_ptr, uint64_t size) {
+  for (struct header *cur = free_list_ptr; cur != NULL; cur = cur->next) {
+    if (cur->size >= size) {
+      return cur->id;
+    }
+  }
+  return -1;
+}
+
+/*
+ Best-fit: return the id of the smallest free block whose size >= requested
+ size. If none found, return -1.
+*/
+int find_best_fit(struct header *free_list_ptr, uint64_t size) {
+  int best_fit_id = -1;
+  uint64_t best_fit_size = 0; // valid only when best_fit_id != -1
+
+  for (struct header *cur = free_list_ptr; cur != NULL; cur = cur->next) {
+    if (cur->size >= size) {
+      if (best_fit_id == -1 || cur->size < best_fit_size) {
+        best_fit_id = cur->id;
+        best_fit_size = cur->size;
+      }
+    }
+  }
+  return best_fit_id;
+}
+
+/*
+ Worst-fit: return the id of the largest free block whose size >= requested
+ size. If none found, return -1.
+*/
+int find_worst_fit(struct header *free_list_ptr, uint64_t size) {
+  int worst_fit_id = -1;
+  uint64_t worst_fit_size = 0;
+
+  for (struct header *cur = free_list_ptr; cur != NULL; cur = cur->next) {
+    if (cur->size >= size) {
+      if (worst_fit_id == -1 || cur->size > worst_fit_size) {
+        worst_fit_id = cur->id;
+        worst_fit_size = cur->size;
+      }
+    }
+  }
+  return worst_fit_id;
+}
+
+int main(void) {
+  struct header *free_block1 = (struct header *)malloc(sizeof(struct header));
+  struct header *free_block2 = (struct header *)malloc(sizeof(struct header));
+  struct header *free_block3 = (struct header *)malloc(sizeof(struct header));
+  struct header *free_block4 = (struct header *)malloc(sizeof(struct header));
+  struct header *free_block5 = (struct header *)malloc(sizeof(struct header));
+
+  if (!free_block1 || !free_block2 || !free_block3 || !free_block4 ||
+      !free_block5) {
+    fprintf(stderr, "malloc failed\n");
+    free(free_block1);
+    free(free_block2);
+    free(free_block3);
+    free(free_block4);
+    free(free_block5);
+    return 1;
+  }
+
+  initialize_block(free_block1, 6, free_block2, 1);
+  initialize_block(free_block2, 12, free_block3, 2);
+  initialize_block(free_block3, 24, free_block4, 3);
+  initialize_block(free_block4, 8, free_block5, 4);
+  initialize_block(free_block5, 4, NULL, 5);
+
+  struct header *free_list_ptr = free_block1;
+
+  int first_fit_id = find_first_fit(free_list_ptr, 7);
+  int best_fit_id = find_best_fit(free_list_ptr, 7);
+  int worst_fit_id = find_worst_fit(free_list_ptr, 7);
+
+  printf("The ID for First-Fit algorithm is: %d\n", first_fit_id);
+  printf("The ID for Best-Fit algorithm is: %d\n", best_fit_id);
+  printf("The ID for Worst-Fit algorithm is: %d\n", worst_fit_id);
+
+  // cleanup
+  free(free_block1);
+  free(free_block2);
+  free(free_block3);
+  free(free_block4);
+  free(free_block5);
+
+  return 0;
+}
